@@ -4,3 +4,6 @@
 
 ### App Name: Blockchain Sim+
 This project is licensed under the Apache License 2.0. Copyright © 2025, Enes Eken.
+### Application pages
+<img src="https://github.com/eneseken95/Blockchain_Sim_Plus/blob/main/Screenshots/Screenshot1.png" alt="Screenshoots" width="350" height="550" />
+<img src="https://github.com/eneseken95/Blockchain_Sim_Plus/blob/main/Screenshots/Screenshot2.png" alt="Screenshoots" width="350" height="550" />
