@@ -38,20 +38,27 @@ final class PoSEngine: ConsensusEngine {
 
         for e in 0 ..< epochs {
             for s in 0 ..< slots {
+                // 1. Weighted Random Selection: Richer validators have a higher chance to be chosen
                 let w = vals.map { $0.stake }
                 guard let idx = rng.weightedIndex(weights: w) else {
                     logs.append("[PoS] no active validators"); break
                 }
+                
+                // 2. Simulation of "Offline" validators (Slashing Condition 1)
                 if rng.double() < offP {
                     vals[idx].stake = max(0, vals[idx].stake - slash)
                     logs.append("[PoS] e=\(e) s=\(s) \(vals[idx].vid) OFFLINE → slash -\(slash) stake=\(vals[idx].stake)")
                     continue
                 }
+                
+                // 3. Block Creation
                 let data = "epoch=\(e),slot=\(s),prop=\(vals[idx].vid),stake=\(vals[idx].stake)"
                 let b = Block(index: store.all().count, prevHash: store.tip().hash, timestamp: Date().timeIntervalSince1970, data: data, difficulty: 0, nonce: 0)
                 store.append(b); produced += 1
                 logs.append("[PoS] e=\(e) s=\(s) prop=\(vals[idx].vid) blk=\(b.hash.prefix(12))…")
                 samples.append(MetricSample(series: "pos_slots_\(vals[idx].vid)", x: Double(e * slots + s), y: 1))
+                
+                // 4. Simulation of "Malicious" behavior (Slashing Condition 2)
                 if rng.double() < eqP && vals[idx].stake > 0 {
                     vals[idx].stake = max(0, vals[idx].stake - slash)
                     logs.append("[PoS] EQUIVOCATION by \(vals[idx].vid) → slash -\(slash) stake=\(vals[idx].stake)")
